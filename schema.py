@@ -22,4 +22,15 @@ class Match(_MatchBase):
         from_attributes =True
 
 
+class _UserBase(_pydantic.BaseModel):
+    username:str
+
+class UserCreate(_UserBase):
+    password:str
+
+class User(_UserBase):
+    id:int
+
+    class Config:
+        from_attributes=True
 
