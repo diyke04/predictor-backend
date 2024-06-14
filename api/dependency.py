@@ -8,7 +8,7 @@ from db.session import get_db
 from crud import crud_users
 from models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     print("token")
@@ -27,6 +27,5 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = crud_users.get_user_by_username(db=db, username=username)
     if user is None:
         raise credentials_exception
-    
-    print("id",user.id)
+
     return user.id

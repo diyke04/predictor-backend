@@ -11,4 +11,4 @@ class Prediction(BaseModel):
     prediction: str
     
     class Config:
-        orm_mode = True
+        from_attributes = True

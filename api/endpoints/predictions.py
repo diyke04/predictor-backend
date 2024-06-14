@@ -10,7 +10,6 @@ router = APIRouter()
 
 @router.post("/", response_model=Prediction)
 def create_prediction(prediction: PredictionCreate, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
-    print(user_id)
     return crud_predictions.create_prediction(db=db, prediction=prediction, user_id=user_id)
 
 @router.get("/user/{user_id}", response_model=List[Prediction])
