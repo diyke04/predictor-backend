@@ -1,7 +1,7 @@
-import pydantic as _pydantic
-import datetime as _dt
+from pydantic import BaseModel
+from datetime import datetime
 
-class _MatchBase(_pydantic.BaseModel):
+class _MatchBase(BaseModel):
     date:str
     away_team:str
     home_team:str
@@ -22,7 +22,7 @@ class Match(_MatchBase):
         from_attributes =True
 
 
-class _UserBase(_pydantic.BaseModel):
+class _UserBase(BaseModel):
     username:str
 
 class UserCreate(_UserBase):
@@ -33,4 +33,12 @@ class User(_UserBase):
 
     class Config:
         from_attributes=True
+
+class LoginSchema(BaseModel):
+    usename:str
+    password:str
+
+class TokenSchema(BaseModel):
+    access_token:str
+    token_type:str
 

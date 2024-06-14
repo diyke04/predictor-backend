@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import FastAPI,Depends,HTTPException,status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 import auth as _auth
 import schema as _schema
 from sqlalchemy.orm import Session
@@ -51,3 +51,7 @@ async def generate_token(form_data:OAuth2PasswordRequestForm=Depends(), db:Sessi
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="INVALID CREDENTIALS")
     
     return await _auth.create_token(user=user)
+
+@app.get('/api/user/me')
+async def get_user(user:_schema.User=Depends(_auth.get_current_user)):
+    return user
