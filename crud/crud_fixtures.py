@@ -1,12 +1,14 @@
 from sqlalchemy.orm import Session
 from models.fixture import Fixture
 from schemas.fixture import FixtureCreate, FixtureUpdate
+from models.league import League
 
 def create_fixture(db: Session, fixture: FixtureCreate):
     db_fixture = Fixture(**fixture.dict())
     db.add(db_fixture)
     db.commit()
     db.refresh(db_fixture)
+
     return db_fixture
 
 def get_fixtures(db: Session, skip: int = 0, limit: int = 10):

@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 
 from crud import crud_users
-from schemas.user import UserCreate, User
+from schemas.user import UserCreate, User,UserUpdateRole
 from core.security import verify_password, create_access_token
 from db.session import get_db
+from api.dependency import get_current_user
 
 router = APIRouter()
 
@@ -23,3 +24,9 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.put("/user-role", response_model=User)
+def update_user_role(role: UserUpdateRole, db: Session = Depends(get_db),id:int=Depends(get_current_user)):
+
+    return crud_users.update_user_role(user_id=id,role=role,db=db)

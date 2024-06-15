@@ -9,8 +9,8 @@ from db.session import get_db
 router = APIRouter()
 
 @router.post("/", response_model=Prediction)
-def create_prediction(prediction: PredictionCreate, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
-    return crud_predictions.create_prediction(db=db, prediction=prediction, user_id=user_id)
+def create_prediction(prediction: PredictionCreate, db: Session = Depends(get_db), user= Depends(get_current_user)):
+    return crud_predictions.create_prediction(db=db, prediction=prediction, user_id=user.id)
 
 @router.get("/user/{user_id}", response_model=List[Prediction])
 def read_user_predictions(user_id: int, db: Session = Depends(get_db)):

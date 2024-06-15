@@ -1,7 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
-
+from api.dependency import is_superuser
 from crud import crud_fixtures
 from schemas.fixture import FixtureCreate, Fixture, FixtureUpdate
 from db.session import get_db
@@ -9,8 +9,11 @@ from db.session import get_db
 router = APIRouter()
 
 @router.post("/", response_model=Fixture)
-def create_fixture(fixture: FixtureCreate, db: Session = Depends(get_db)):
-    return crud_fixtures.create_fixture(db=db, fixture=fixture)
+def create_fixture(fixture: FixtureCreate, db: Session = Depends(get_db),admin=Depends(is_superuser)):
+    if admin:
+        return crud_fixtures.create_fixture(db=db, fixture=fixture)
+    else:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail="Not Authorised")
 
 @router.get("/", response_model=List[Fixture])
 def read_fixtures(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
