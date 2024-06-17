@@ -9,11 +9,13 @@ def create_user(db: Session, user: UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    print(db_user)
     return db_user
 
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
+
+def get_user_by_email(db: Session, email: str):
+    return db.query(User).filter(User.email == email).first()
 
 from sqlalchemy.exc import NoResultFound
 
@@ -22,8 +24,6 @@ def update_user_role(db: Session, user_id: int, role: UserUpdateRole):
         user = db.query(User).filter(User.id == user_id).one()
         
         # Update the user's roles if the fields are provided
-        if role.is_super_user is not None:
-            user.is_super_user = role.is_super_user
         if role.is_admin is not None:
             user.is_admin = role.is_admin
         

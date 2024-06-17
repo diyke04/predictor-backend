@@ -8,6 +8,9 @@ class UserCreate(BaseModel):
 class UserUpdateRole(BaseModel):
     is_admin: bool | None = None
 
+class LoginUser(BaseModel):
+    username:str
+    password:str
 
 class User(BaseModel):
     id: int

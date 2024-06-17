@@ -12,3 +12,6 @@ def create_league(db: Session, league: LeagueCreate):
 
 def get_league_by_id(db: Session, id: int):
     return db.query(League).filter(League.id== id).first()
+
+def get_leagues(db:Session):
+    return db.query(League).all()
