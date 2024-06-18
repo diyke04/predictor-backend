@@ -5,14 +5,15 @@ from models.league import League
 from schemas.prediction import PredictionCreate,PredictionUpdate
 from fastapi import HTTPException, status
 from reward import reward
+from core.config import RewardType
 
 async def create_prediction(db: Session, prediction: PredictionCreate, user_id: int):
     db_prediction = Prediction(**prediction.model_dump(), user_id=user_id)
     db.add(db_prediction)
     db.commit()
     db.refresh(db_prediction)
-    await reward.evaluate_prediction(prediction=db_prediction,db=db)
-    return db_prediction
+    await reward.reward_user(user=db_prediction.user,db=db,reward_type=RewardType.POST_PREDICTION)
+    return db_prediction.to_dict()
 
 async def get_predictions_by_user(db: Session, user_id: int):
     predictions=db.query(Prediction).filter(Prediction.user_id == user_id).all()
@@ -62,10 +63,14 @@ async def delete_user_prediction(db:Session,user_id:int,prediction_id):
 
     if not prediction_obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if prediction_obj.fixture.status.value=='completed'or prediction_obj.fixture.status.value =='in_progress':
+        raise HTTPException(status.HTTP_400_BAD_REQUEST,detail="Match already Ended")
 
 
     db.delete(prediction_obj)
     db.commit()
+    
+    await reward.reward_user(user=prediction_obj.user,reward_type=RewardType.DELETE_PREDICTION,db=db)
 
     return {"status":status.HTTP_200_OK,"detail":"prediction deleted"}
 

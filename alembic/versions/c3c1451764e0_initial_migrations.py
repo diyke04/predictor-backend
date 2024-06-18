@@ -1,8 +1,8 @@
 """initial migrations
 
-Revision ID: ce1bafe71dae
+Revision ID: c3c1451764e0
 Revises: 
-Create Date: 2024-06-17 22:07:25.655307
+Create Date: 2024-06-18 22:30:37.375793
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ce1bafe71dae'
+revision: str = 'c3c1451764e0'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -34,6 +34,7 @@ def upgrade() -> None:
     sa.Column('hashed_password', sa.String(), nullable=True),
     sa.Column('email', sa.String(length=100), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=True),
+    sa.Column('point', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
@@ -46,10 +47,11 @@ def upgrade() -> None:
     sa.Column('away_team', sa.String(length=100), nullable=True),
     sa.Column('match_week', sa.Integer(), nullable=True),
     sa.Column('match_date', sa.DateTime(), nullable=True),
-    sa.Column('home_team_ft_score', sa.Integer(), nullable=True),
-    sa.Column('away_team_ft_score', sa.Integer(), nullable=True),
+    sa.Column('home_team_ft_score', sa.String(length=10), nullable=True),
+    sa.Column('away_team_ft_score', sa.String(length=10), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('status', sa.Enum('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'POSTPONED', name='fixturestatus'), nullable=True),
     sa.ForeignKeyConstraint(['league_id'], ['leagues.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -61,8 +63,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('fixture_id', sa.Integer(), nullable=True),
-    sa.Column('home_prediction_score', sa.Integer(), nullable=True),
-    sa.Column('away_prediction_score', sa.Integer(), nullable=True),
+    sa.Column('home_prediction_score', sa.String(length=10), nullable=True),
+    sa.Column('away_prediction_score', sa.String(length=10), nullable=True),
     sa.ForeignKeyConstraint(['fixture_id'], ['fixtures.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

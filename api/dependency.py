@@ -10,7 +10,7 @@ from models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
@@ -23,7 +23,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = crud_users.get_user_by_username(db=db, username=username)
+    user = await crud_users.get_user_by_username(db=db, username=username)
     if user is None:
         raise credentials_exception
 

@@ -41,13 +41,7 @@ async def get_fixtures_user_not_predicted(league_id:int, db: Session = Depends(g
 
 @router.delete("/delete", response_model=Fixture)
 async def delete_fixture(fixture_id: int, db: Session = Depends(get_db)):
-    db_fixture = await crud_fixtures.get_fixture(db=db, fixture_id=fixture_id)
-    if not db_fixture:
-        raise HTTPException(status_code=404, detail="Fixture not found")
-    
-    db.delete(db_fixture)
-    db.commit()
-    return {"status":True}
+    return await crud_fixtures.delete_fixture(db=db,fixture_id=fixture_id)
 
 @router.put("/update", response_model=Fixture)
 async def update_fixture_scores(fixture_id: int, fixture_update: FixtureUpdate, db: Session = Depends(get_db)):
