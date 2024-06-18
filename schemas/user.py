@@ -17,6 +17,7 @@ class User(BaseModel):
     username: str
     email: str
     is_admin: bool | None = None
+    token:int
     
     class Config:
         from_attributes = True

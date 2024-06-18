@@ -10,3 +10,11 @@ class League(Base):
     premium = Column(Boolean, default=False)
     
     fixtures = relationship('Fixture', back_populates='league')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name":self.name,
+            "premium":self.premium
+        }
+

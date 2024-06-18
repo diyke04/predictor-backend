@@ -13,6 +13,11 @@ class Prediction(BaseModel):
     fixture: Fixture
     home_prediction_score:int
     away_prediction_score:int
+  
+class PredictionUpdate(BaseModel):
+    home_prediction_score:int
+    away_prediction_score:int
+  
     
     class Config:
         from_attributes = True

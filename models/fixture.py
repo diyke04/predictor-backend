@@ -1,7 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from enum import Enum
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey,Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from db.base import Base
 from datetime import datetime
+
+class FixtureStatus(Enum):
+    SCHEDULED = "scheduled"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    POSTPONED = "postponed"
 
 class Fixture(Base):
     __tablename__ = "fixtures"
@@ -18,6 +25,7 @@ class Fixture(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
     league = relationship('League', back_populates='fixtures')
     predictions = relationship('Prediction', back_populates='fixture')
+    status = Column(SQLEnum(FixtureStatus), default=FixtureStatus.SCHEDULED)
 
     def result(self):
         if self.home_team_ft_score and self.away_team_ft_score is not None:
@@ -28,3 +36,18 @@ class Fixture(Base):
             else:
                 return 'draw'
         return 'no result'
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "league": self.league.to_dict(),
+            "home_team": self.home_team,
+            "away_team": self.away_team,
+            "match_week": self.match_week,
+            "match_date": self.match_date.isoformat() if self.match_date else None,
+            "home_team_ft_score": self.home_team_ft_score,
+            "away_team_ft_score": self.away_team_ft_score,
+            "result": self.result() if self.result else None,
+            "status": self.status.value
+        }
+

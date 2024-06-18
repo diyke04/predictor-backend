@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from enum import Enum
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./predictor.db"
@@ -11,3 +12,11 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 settings = Settings()
+
+
+
+class RewardType(Enum):
+    POST_PREDICTION = 1
+    CORRECT_SCORE = 5
+    CORRECT_RESULT = 2
+

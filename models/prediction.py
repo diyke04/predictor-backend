@@ -10,7 +10,6 @@ class Prediction(Base):
     fixture_id = Column(Integer, ForeignKey("fixtures.id"))
     home_prediction_score = Column(Integer)
     away_prediction_score = Column(Integer)
-    
     fixture = relationship('Fixture', back_populates='predictions')
     user = relationship('User', back_populates='predictions')
 
@@ -28,6 +27,14 @@ class Prediction(Base):
         if self.fixture.home_team_ft_score and self.fixture.away_team_ft_score and self.home_prediction_score and self.away_prediction_score is not None:
             if (self.fixture.home_team_ft_score == self.home_prediction_score) and (self.fixture.away_team_ft_score == self.away_prediction_score):
                 return 'correct'
-            else:
-                return "not correct"
-        return 'no prediction'
+
+        return 'not correct'
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "home_prediction_score": self.home_prediction_score,
+            "away_prediction_score": self.away_prediction_score,
+            "user": self.user.to_dict() if self.user else None,
+            "fixture": self.fixture.to_dict() if self.fixture else None
+        }
