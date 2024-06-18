@@ -22,6 +22,7 @@ class Fixture(BaseModel):
     league: League
     home_team_ft_score: int | None
     away_team_ft_score: int | None
+    result:str
     
     class Config:
         from_attributes = True

@@ -15,15 +15,16 @@ class Fixture(Base):
     home_team_ft_score = Column(Integer, nullable=True)
     away_team_ft_score = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
     league = relationship('League', back_populates='fixtures')
     predictions = relationship('Prediction', back_populates='fixture')
 
     def result(self):
-        if self.home_team_ft_score > self.away_team_ft_score:
-            return 'home'
-        elif self.away_team_ft_score > self.home_team_ft_score:
-            return 'away'
-        else:
-            return 'draw'
+        if self.home_team_ft_score and self.away_team_ft_score is not None:
+            if self.home_team_ft_score > self.away_team_ft_score:
+                return 'home'
+            elif self.away_team_ft_score > self.home_team_ft_score:
+                return 'away'
+            else:
+                return 'draw'
+        return 'no result'

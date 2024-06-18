@@ -15,15 +15,19 @@ class Prediction(Base):
     user = relationship('User', back_populates='predictions')
 
     def result(self):
-        if self.home_prediction_score > self.away_prediction_score:
-            return 'home'
-        elif self.away_prediction_score > self.home_prediction_score:
-            return 'away'
-        else:
-            return 'draw'
+        if self.home_prediction_score and self.away_prediction_score is not None:
+            if self.home_prediction_score > self.away_prediction_score:
+                return 'home'
+            elif self.away_prediction_score > self.home_prediction_score:
+                return 'away'
+            else:
+                return 'draw'
+        return 'no prediction'
         
     def correct_score(self):
-        if (self.fixture.home_team_ft_score == self.home_prediction_score) and (self.fixture.away_team_ft_score == self.away_prediction_score):
-            return 'correct'
-        else:
-            return "not correct"
+        if self.fixture.home_team_ft_score and self.fixture.away_team_ft_score and self.home_prediction_score and self.away_prediction_score is not None:
+            if (self.fixture.home_team_ft_score == self.home_prediction_score) and (self.fixture.away_team_ft_score == self.away_prediction_score):
+                return 'correct'
+            else:
+                return "not correct"
+        return 'no prediction'
