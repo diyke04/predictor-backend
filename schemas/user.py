@@ -5,10 +5,18 @@ class UserCreate(BaseModel):
     password: str
     email: str
 
+class UserUpdateRole(BaseModel):
+    is_admin: bool | None = None
+
+class LoginUser(BaseModel):
+    username:str
+    password:str
+
 class User(BaseModel):
     id: int
     username: str
     email: str
+    is_admin: bool | None = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True

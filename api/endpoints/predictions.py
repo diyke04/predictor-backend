@@ -9,9 +9,8 @@ from db.session import get_db
 router = APIRouter()
 
 @router.post("/", response_model=Prediction)
-def create_prediction(prediction: PredictionCreate, db: Session = Depends(get_db), user_id: int = Depends(get_current_user)):
-    print(user_id)
-    return crud_predictions.create_prediction(db=db, prediction=prediction, user_id=user_id)
+def create_prediction(prediction: PredictionCreate, db: Session = Depends(get_db), user= Depends(get_current_user)):
+    return crud_predictions.create_prediction(db=db, prediction=prediction, user_id=user.id)
 
 @router.get("/user/{user_id}", response_model=List[Prediction])
 def read_user_predictions(user_id: int, db: Session = Depends(get_db)):
@@ -20,6 +19,10 @@ def read_user_predictions(user_id: int, db: Session = Depends(get_db)):
 @router.get("/fixture/{fixture_id}", response_model=List[Prediction])
 def read_fixture_predictions(fixture_id: int, db: Session = Depends(get_db)):
     return crud_predictions.get_predictions_by_fixture(db=db, fixture_id=fixture_id)
+
+@router.get("/fixtures/league/{league_id}", response_model=List[Prediction])
+def league_predictions(league_id: int,user_id:int, db: Session = Depends(get_db)):
+    return crud_predictions.get_user_predictions_in_league(db=db, league_id=league_id,user_id=user_id)
 
 @router.get("/results/{user_id}", response_model=List[Prediction])
 def read_user_prediction_results(user_id: int, db: Session = Depends(get_db)):
@@ -30,7 +33,7 @@ def read_user_prediction_results(user_id: int, db: Session = Depends(get_db)):
         if fixture.home_team_score is not None and fixture.away_team_score is not None:
             # Here you can compare the prediction with the actual result
             # and append to the results list
-            if (fixture.home_team_score > fixture.away_team_score and prediction.prediction == "home") or \
+            if (fixture.home_team_score > fixture.away_team_score and prediction.home_prediction_score>prediction.away_prediction_score) or \
                (fixture.home_team_score < fixture.away_team_score and prediction.prediction == "away") or \
                (fixture.home_team_score == fixture.away_team_score and prediction.prediction == "draw"):
                 results.append({"fixture_id": fixture.id, "prediction": prediction.prediction, "result": "correct"})

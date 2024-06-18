@@ -1,14 +1,18 @@
 from pydantic import BaseModel
+from schemas.fixture import Fixture
+from schemas.user import User
 
 class PredictionCreate(BaseModel):
     fixture_id: int
-    prediction: str
-
+    home_prediction_score:int
+    away_prediction_score:int
+    
 class Prediction(BaseModel):
     id: int
-    user_id: int
-    fixture_id: int
-    prediction: str
+    user: User
+    fixture: Fixture
+    home_prediction_score:int
+    away_prediction_score:int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
