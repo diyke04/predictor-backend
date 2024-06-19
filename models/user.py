@@ -11,13 +11,13 @@ class User(Base):
     email = Column(String(100), unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     predictions = relationship('Prediction', back_populates='user')
-    token = Column(Integer, default=0)
+    point = Column(Integer, default=0)
 
     def to_dict(self):
         return {
             "id": self.id,
             "email":self.email,
             "username": self.username,
-            "token":self.token,
+            "point":self.point,
             
         }

@@ -1,9 +1,11 @@
 from sqlalchemy.sql import exists
 from sqlalchemy.orm import Session
-from models.fixture import Fixture
+from models.fixture import Fixture,FixtureStatus
 from schemas.fixture import FixtureCreate, FixtureUpdate
 from models.prediction import Prediction
 from reward import reward
+from core.config import RewardType
+from fastapi import HTTPException,status
 
 async def create_fixture(db: Session, fixture: FixtureCreate):
     db_fixture = Fixture(**fixture.dict())
@@ -11,7 +13,7 @@ async def create_fixture(db: Session, fixture: FixtureCreate):
     db.commit()
     db.refresh(db_fixture)
 
-    return db_fixture
+    return db_fixture.to_dict()
 
 
 async def get_fixture(db: Session, fixture_id: int):
@@ -45,6 +47,7 @@ async def update_fixture_scores(db: Session, fixture_id: int, fixture_update: Fi
 
     db_fixture.home_team_ft_score =fixture_update.home_team_ft_score
     db_fixture.away_team_ft_score=fixture_update.away_team_ft_score
+    db_fixture.status=FixtureStatus.COMPLETED
     
     db.add(db_fixture)
     db.commit()
@@ -53,4 +56,15 @@ async def update_fixture_scores(db: Session, fixture_id: int, fixture_update: Fi
     for prediction in db_fixture.predictions:
         await reward.evaluate_prediction(prediction, db)
 
-    return db_fixture
+    return db_fixture.to_dict()
+
+async def delete_fixture(db:Session,fixture_id):
+    fixture =db.query(Fixture).filter(Fixture.id==fixture_id).first()
+    
+    db.delete(fixture)
+    db.commit()
+    return {
+        "status": "deleted"
+    }
+
+   
