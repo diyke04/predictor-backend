@@ -33,7 +33,6 @@ async def get_league_fixtures(league_id: int, db: Session = Depends(get_db),):
 
 @router.get("/user/not-predicted", response_model=List[Fixture])
 async def get_fixtures_user_not_predicted(league_id:int, db: Session = Depends(get_db),user=Depends(get_current_user)):
-    print("user",user)
     db_fixtures = await crud_fixtures.get_fixtures_user_has_not_predicted_on(user_id=user.id,db=db,league_id=league_id)
     if not db_fixtures:
         raise HTTPException(status_code=404, detail="Fixture not found")
