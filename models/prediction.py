@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, ForeignKey,String
 from sqlalchemy.orm import relationship
 from db.base import Base
+from core.config import RewardType
+
 
 class Prediction(Base):
     __tablename__ = "predictions"
@@ -12,6 +14,7 @@ class Prediction(Base):
     away_prediction_score = Column(String(10))
     fixture = relationship('Fixture', back_populates='predictions')
     user = relationship('User', back_populates='predictions')
+
 
     def result(self):
         if self.home_prediction_score and self.away_prediction_score is not None:
@@ -30,6 +33,8 @@ class Prediction(Base):
                 return 'correct'
 
         return 'not correct'
+    
+
     
     def to_dict(self):
         return {
