@@ -32,7 +32,7 @@ async def get_fixtures_by_league(db: Session, league_id: int):
 async def get_fixtures_user_has_not_predicted_on(user_id: int, league_id: int, db: Session):
     subquery = db.query(Prediction.fixture_id).filter(Prediction.user_id == user_id).subquery()
     fixtures = db.query(Fixture).filter(
-        Fixture.league_id == league_id,
+        Fixture.league_id == league_id,Fixture.status!="COMPLETED",
         ~exists().where(Fixture.id == subquery.c.fixture_id)
     ).all()
     fixtures_response = [
