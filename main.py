@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.endpoints import auth, fixtures, predictions,league
 
 
-origins =['http://localhost:5173',]
+origins =['http://localhost:5173','https://predictor-backend-one.vercel.app']
 
 app = FastAPI()
 
