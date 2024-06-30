@@ -1,40 +1,42 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound
 from models.user import User
-from schemas.user import UserCreate,UserUpdateRole
+from schemas.user import UserCreate, UserUpdateRole
 from core.config import RewardType
 from core.security import get_password_hash
 from reward.reward import reward_user
 
-
-async def create_user(db: Session, user: UserCreate):
+async def create_user(db: AsyncSession, user: UserCreate):
     hashed_password = get_password_hash(user.password)
     db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    await reward_user(user=db_user,reward_type=RewardType.USER_CREATION,db=db)
+    await db.commit()
+    await db.refresh(db_user)
+    await reward_user(user=db_user, reward_type=RewardType.USER_CREATION, db=db)
     return db_user
 
-async def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+async def get_user_by_username(db: AsyncSession, username: str):
+    result = await db.execute(select(User).filter(User.username == username))
+    user = result.scalars().first()
+    return user
 
-async def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+async def get_user_by_email(db: AsyncSession, email: str):
+    result = await db.execute(select(User).filter(User.email == email))
+    user = result.scalars().first()
+    return user
 
-async def update_user_role(db: Session, user_id: int, role: UserUpdateRole):
+async def update_user_role(db: AsyncSession, user_id: int, role: UserUpdateRole):
     try:
-        user = db.query(User).filter(User.id == user_id).one()
-        
-        # Update the user's roles if the fields are provided
+        result = await db.execute(select(User).filter(User.id == user_id))
+        user = result.scalars().one()
+
         if role.is_admin is not None:
             user.is_admin = role.is_admin
-        
-        # Commit the changes to the database
-        db.commit()
-        db.refresh(user)
-        
+
+        await db.commit()
+        await db.refresh(user)
+
         return user
     except NoResultFound:
-        # Handle the case where the user does not exist
         return None

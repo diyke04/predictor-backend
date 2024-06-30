@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
 
 from crud import crud_users
@@ -23,7 +24,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return await crud_users.create_user(db=db, user=user)
 
 @router.post("/token")
-async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     user = await crud_users.get_user_by_username(db, username=form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -31,7 +32,7 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessi
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/login")
-async def login_user(form_data:LoginUser, db: Session = Depends(get_db)):
+async def login_user(form_data:LoginUser, db: AsyncSession = Depends(get_db)):
     user = await crud_users.get_user_by_username(db, username=form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")

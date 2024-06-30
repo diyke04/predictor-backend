@@ -22,3 +22,8 @@ class RewardType(Enum):
     CORRECT_SCORE = 20000
     CORRECT_RESULT = 5000
 
+
+urls = [
+    'https://fbref.com/en/comps/9/2024-2025/schedule/2024-2025-Premier-League-Scores-and-Fixtures',
+    'https://fbref.com/en/comps/12/2024-2025/schedule/2024-2025-La-Liga-Scores-and-Fixtures',
+]
