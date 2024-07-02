@@ -14,24 +14,32 @@ class Fixture(Base):
     __tablename__ = "fixtures"
     
     id = Column(Integer, primary_key=True, index=True)
-    league_id = Column(Integer, ForeignKey('leagues.id'))
+    key=Column(String(220), index=True)
+    week = Column(String(10), index=True)
+    day = Column(String(10),nullable=True)
+    date = Column(DateTime)
+    time = Column(String(10),nullable=True)
+    league=Column(String(100))
     home_team = Column(String(100), index=True)
+    home_score = Column(String(10),nullable=True)
+    home_xg = Column(String(10),nullable=True)
+    score = Column(String(10),nullable=True)
+    away_score = Column(String(10),nullable=True)
+    away_xg = Column(String(10),nullable=True)
     away_team = Column(String(100), index=True)
-    match_week = Column(Integer, index=True)
-    match_date = Column(DateTime)
-    home_team_ft_score = Column(String(10), nullable=True)
-    away_team_ft_score = Column(String(10), nullable=True)
+    attendance = Column(Integer, nullable=True)
+    venue = Column(String(100))
+    referee = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)  
-    league = relationship('League', back_populates='fixtures')
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     predictions = relationship('Prediction', back_populates='fixture')
     status = Column(SQLEnum(FixtureStatus), default=FixtureStatus.SCHEDULED)
 
     def result(self):
-        if self.home_team_ft_score and self.away_team_ft_score is not None:
-            if self.home_team_ft_score > self.away_team_ft_score:
+        if self.home_score and self.away_score is not None:
+            if self.home_score > self.away_score:
                 return 'home'
-            elif self.away_team_ft_score > self.home_team_ft_score:
+            elif self.away_score > self.home_score:
                 return 'away'
             else:
                 return 'draw'
@@ -40,13 +48,13 @@ class Fixture(Base):
     def to_dict(self):
         return {
             "id": self.id,
-            "league": self.league.to_dict(),
+            "league": self.league,
             "home_team": self.home_team,
             "away_team": self.away_team,
-            "match_week": self.match_week,
-            "match_date": self.match_date.isoformat() if self.match_date else None,
-            "home_team_ft_score": self.home_team_ft_score,
-            "away_team_ft_score": self.away_team_ft_score,
+            "match_week": self.week,
+            "match_date": self.date.isoformat() if self.date else None,
+            "home_score": self.home_score,
+            "away_score": self.away_score,
             "result": self.result() if self.result else None,
             "status": self.status.value
         }

@@ -3,27 +3,38 @@ from pydantic import BaseModel
 from schemas.league import League
 
 class FixtureCreate(BaseModel):
+    key:str
+    week: str
+    date: datetime
     home_team: str
     away_team: str
-    match_date: datetime
-    match_week:int
-    league_id: int
+    venue: str
+    league:str
 
 class FixtureUpdate(BaseModel):
-    home_team_ft_score: str
-    away_team_ft_score: str
+    score: str | None
+    attendance: str | None
+    referee: str | None
+    home_xg: str | None
+    away_xg: str | None
+    home_score: str | None
+    away_score: str | None
 
 class Fixture(BaseModel):
     id: int
+    week: str
+    day: str
+    date: datetime
+    time: str
     home_team: str
     away_team: str
-    match_week:int
-    match_date: datetime
-    league: League
-    home_team_ft_score: str | None
-    away_team_ft_score: str | None
-    result:str
-    status:str
+    home_score: str | None
+    away_score: str | None
+    home_xg: float
+    away_xg: float
+    attendance: int | None
+    venue: str
+    referee: str | None
     
     class Config:
         from_attributes = True
