@@ -23,18 +23,15 @@ class FixtureUpdate(BaseModel):
 class Fixture(BaseModel):
     id: int
     week: str
-    day: str
     date: datetime
-    time: str
     home_team: str
     away_team: str
     home_score: str | None
     away_score: str | None
-    home_xg: float
-    away_xg: float
-    attendance: int | None
-    venue: str
-    referee: str | None
+    result:str|None
+    status:str|None
+    league:str
+
     
     class Config:
         from_attributes = True

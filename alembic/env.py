@@ -6,6 +6,7 @@ from models.user import User
 from models.fixture import Fixture
 from models.prediction import Prediction
 from models.league import League
+from models.services import TaskStatus
 from alembic import context
 
 # this is the Alembic Config object, which provides

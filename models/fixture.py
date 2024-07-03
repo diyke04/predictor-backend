@@ -48,11 +48,11 @@ class Fixture(Base):
     def to_dict(self):
         return {
             "id": self.id,
+            "week":self.week,
+            "date":self.date,
             "league": self.league,
             "home_team": self.home_team,
             "away_team": self.away_team,
-            "match_week": self.week,
-            "match_date": self.date.isoformat() if self.date else None,
             "home_score": self.home_score,
             "away_score": self.away_score,
             "result": self.result() if self.result else None,
