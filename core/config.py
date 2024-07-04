@@ -1,3 +1,4 @@
+import asyncio
 from pydantic_settings import BaseSettings
 from enum import Enum
 
@@ -22,6 +23,7 @@ class RewardType(Enum):
     CORRECT_SCORE = 20000
     CORRECT_RESULT = 5000
 
+semaphore = asyncio.Semaphore(2)
 
 urls = [
     'https://fbref.com/en/comps/9/2024-2025/schedule/2024-2025-Premier-League-Scores-and-Fixtures',

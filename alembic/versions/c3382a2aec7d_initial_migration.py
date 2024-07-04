@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 026a64378e35
+Revision ID: c3382a2aec7d
 Revises: 
-Create Date: 2024-06-30 21:41:30.233942
+Create Date: 2024-07-02 17:32:21.238892
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '026a64378e35'
+revision: str = 'c3382a2aec7d'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -56,6 +56,15 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_leagues_id'), 'leagues', ['id'], unique=False)
     op.create_index(op.f('ix_leagues_name'), 'leagues', ['name'], unique=False)
+    op.create_table('task_statuses',
+    sa.Column('task_id', sa.String(), nullable=False),
+    sa.Column('status', sa.String(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('task_id')
+    )
+    op.create_index(op.f('ix_task_statuses_status'), 'task_statuses', ['status'], unique=False)
+    op.create_index(op.f('ix_task_statuses_task_id'), 'task_statuses', ['task_id'], unique=False)
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=50), nullable=True),
@@ -90,6 +99,9 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
+    op.drop_index(op.f('ix_task_statuses_task_id'), table_name='task_statuses')
+    op.drop_index(op.f('ix_task_statuses_status'), table_name='task_statuses')
+    op.drop_table('task_statuses')
     op.drop_index(op.f('ix_leagues_name'), table_name='leagues')
     op.drop_index(op.f('ix_leagues_id'), table_name='leagues')
     op.drop_table('leagues')

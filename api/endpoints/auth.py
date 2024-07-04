@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordRequestForm
+from utils.send_mail import send_local_email
 
 from crud import crud_users
 from schemas.user import UserCreate, User,UserUpdateRole,LoginUser
@@ -37,6 +38,7 @@ async def login_user(form_data:LoginUser, db: AsyncSession = Depends(get_db)):
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(data={"sub": user.username,"id":user.id})
+    send_local_email(sender_email='admin@admin.com',receiver_email=user.email,subject="Aceess Token",body=access_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
