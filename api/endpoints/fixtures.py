@@ -1,10 +1,10 @@
-import asyncio
+
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.dependency import  get_current_user
 from crud import crud_fixtures
-from schemas.fixture import FixtureCreate, Fixture, FixtureUpdate
+from schemas.fixture import Fixture
 from db.session import AsyncSessionLocal, get_db
 from core.config import urls,semaphore
 import uuid
@@ -47,7 +47,7 @@ async def delete_fixture(fixture_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/scrape", response_model=dict)
-async def scrape_and_update_fixtures(background_tasks: BackgroundTasks,):
+async def scrape_and_update_fixtures(background_tasks: BackgroundTasks):
     task_ids = []
 
     for url in urls:
@@ -56,6 +56,9 @@ async def scrape_and_update_fixtures(background_tasks: BackgroundTasks,):
         background_tasks.add_task(crud_fixtures.fetch_and_process, url, semaphore, task_id, services.update_task_status)
 
     return {"message": "Fixtures scraping and updating initiated.", "task_ids": task_ids}
+
+
+
 
 @router.get("/task-status/{task_id}", response_model=TaskStatusResponse)
 async def get_task_status(task_id: str, db: AsyncSession = Depends(AsyncSessionLocal)):
