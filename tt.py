@@ -145,3 +145,19 @@ async def fetch_and_process(url: str, semaphore: asyncio.Semaphore, task_id: str
                 await callback(db, task_id, "failed")
                 await db.rollback()
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to add fixture: {str(e)}")
+
+
+@router.post("/scrape", response_model=dict)
+async def scrape_and_update_fixtures(background_tasks: BackgroundTasks,):
+    task_ids = []
+
+    for url in urls:
+        task_id = str(uuid.uuid4())
+        task_ids.append(task_id)
+        background_tasks.add_task(crud_fixtures.fetch_and_process, url, semaphore, task_id, services.update_task_status)
+
+    return {"message": "Fixtures scraping and updating initiated.", "task_ids": task_ids}
+
+
+how can this be improved
+

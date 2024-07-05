@@ -47,7 +47,7 @@ async def delete_fixture(fixture_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/scrape", response_model=dict)
-async def scrape_and_update_fixtures(background_tasks: BackgroundTasks):
+async def scrape_and_update_fixtures(background_tasks: BackgroundTasks,):
     task_ids = []
 
     for url in urls:
