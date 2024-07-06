@@ -7,7 +7,7 @@ class PredictionCreate(BaseModel):
     home_prediction_score:str
     away_prediction_score:str
     
-class Prediction(BaseModel):
+class PredictionSchema(BaseModel):
     id: int
     user: User
     fixture: Fixture

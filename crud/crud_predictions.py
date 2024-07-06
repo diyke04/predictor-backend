@@ -1,4 +1,7 @@
-from sqlalchemy.orm import Session
+from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from models.prediction import Prediction
 from models.fixture import Fixture
 from models.league import League
@@ -7,43 +10,59 @@ from fastapi import HTTPException, status
 from reward import reward
 from core.config import RewardType
 
-async def create_prediction(db: Session, prediction: PredictionCreate, user_id: int):
+async def create_prediction(db: AsyncSession, prediction: PredictionCreate, user_id: int):
     db_prediction = Prediction(**prediction.model_dump(), user_id=user_id)
     db.add(db_prediction)
     await db.commit()
     await db.refresh(db_prediction)
     await reward.reward_user(user=db_prediction.user,db=db,reward_type=RewardType.POST_PREDICTION)
+    result = await db.execute(
+        select(Prediction).options(selectinload(Prediction.fixture)).where(Prediction.id == db_prediction.id)
+    )
+    db_prediction = result.scalars().first()
     return db_prediction.to_dict()
 
-async def get_predictions_by_user(db: Session, user_id: int):
-    predictions=db.query(Prediction).filter(Prediction.user_id == user_id).all()
-    prediction_response=[
+async def get_predictions_by_user(db: AsyncSession, user_id: int) -> List[dict]:
+    result = await db.execute(select(Prediction).options(selectinload(Prediction.user), selectinload(Prediction.fixture)).where(Prediction.user_id == user_id))
+    predictions = result.scalars().all()
+    prediction_response = [
         prediction.to_dict()
-        for  prediction in predictions
+        for prediction in predictions
     ]
     return prediction_response
 
-async def get_predictions_by_fixture(db: Session, fixture_id: int):
-    fixture_predictions= db.query(Prediction).filter(Prediction.fixture_id == fixture_id).all()
+async def get_predictions_by_fixture(db: AsyncSession, fixture_id: int):
+    results = await db.execute(
+        select(Prediction)
+        .options(selectinload(Prediction.user), selectinload(Prediction.fixture))
+        .filter(Prediction.fixture_id == fixture_id)
+    )
+    fixture_predictions = results.scalars().all()
     fixture_response = [
         prediction.to_dict()
         for prediction in fixture_predictions
     ]
     return fixture_response
 
-async def get_user_predictions_in_league(db: Session, user_id: int, league: str):
-    predictions = db.query(Prediction).join(Fixture).filter(
-        Prediction.user_id == user_id,
-        Fixture.league == league
-    ).all()
+async def get_user_predictions_in_league(db: AsyncSession, user_id: int, league: str):
+    result = await db.execute(
+        select(Prediction)
+        .join(Fixture)
+        .options(selectinload(Prediction.user), selectinload(Prediction.fixture))
+        .filter(
+            Prediction.user_id == user_id,
+            Fixture.league == league
+        )
+    )
 
-    predictions_response=[
+    predictions = result.scalars().all()
+    predictions_response = [
         prediction.to_dict() for prediction in predictions
     ]
 
     return predictions_response
 
-async def update_user_prediction(db:Session,user_id:int,prediction_id:int,score:PredictionUpdate):
+async def update_user_prediction(db:AsyncSession,user_id:int,prediction_id:int,score:PredictionUpdate):
 
     prediction_obj =db.query(Prediction).filter(Prediction.user_id==user_id,Prediction.id==prediction_id).first()
     if not prediction_obj:
@@ -58,7 +77,7 @@ async def update_user_prediction(db:Session,user_id:int,prediction_id:int,score:
 
     return prediction_obj.to_dict()
 
-async def delete_user_prediction(db:Session,user_id:int,prediction_id):
+async def delete_user_prediction(db:AsyncSession,user_id:int,prediction_id):
     prediction_obj =db.query(Prediction).filter(Prediction.user_id==user_id,Prediction.id==prediction_id).first()
 
     if not prediction_obj:
