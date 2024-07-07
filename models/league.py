@@ -8,12 +8,11 @@ class League(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), index=True)
     premium = Column(Boolean, default=False)
+    fixtures = relationship('Fixture', back_populates='league')
     
-
     def to_dict(self):
         return {
             "id": self.id,
-            "name":self.name,
-            "premium":self.premium
+            "name": self.name,
+            "premium": self.premium
         }
-

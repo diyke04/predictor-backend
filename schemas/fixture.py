@@ -9,7 +9,7 @@ class FixtureCreate(BaseModel):
     home_team: str
     away_team: str
     venue: str
-    league:str
+    league_id:int
 
 class FixtureUpdate(BaseModel):
     score: str | None
@@ -20,7 +20,7 @@ class FixtureUpdate(BaseModel):
     home_score: str | None
     away_score: str | None
 
-class Fixture(BaseModel):
+class FixtureSchema(BaseModel):
     id: int
     week: str
     date: datetime
@@ -30,7 +30,7 @@ class Fixture(BaseModel):
     away_score: str | None
     result:str|None
     status:str|None
-    league:str
+    league:League
 
     
     class Config:

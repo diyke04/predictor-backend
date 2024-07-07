@@ -14,6 +14,12 @@ router = APIRouter()
 
 @router.post("/register", response_model=User)
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    if user.username is '':
+        raise HTTPException(status_code=400, detail="Username cannot be empty")
+    if user.email is '':
+        raise HTTPException(status_code=400, detail="email cannot be empty")
+    if user.password is '':
+        raise HTTPException(status_code=400, detail="password cannot be empty")
     db_user_username = await crud_users.get_user_by_username(db, username=user.username)
     db_user_email =await crud_users.get_user_by_email(db=db,email=user.email)
     if db_user_username:

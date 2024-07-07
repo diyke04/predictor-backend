@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schemas.fixture import Fixture
+from schemas.fixture import FixtureSchema
 from schemas.user import User
 
 class PredictionCreate(BaseModel):
@@ -10,7 +10,7 @@ class PredictionCreate(BaseModel):
 class PredictionSchema(BaseModel):
     id: int
     user: User
-    fixture: Fixture
+    fixture: FixtureSchema
     home_prediction_score:str
     away_prediction_score:str
     result:str

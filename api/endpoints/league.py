@@ -9,10 +9,10 @@ from typing import List
 router = APIRouter()
 
 @router.post("/", response_model=League)
-def create_league(league: LeagueCreate, db: Session = Depends(get_db)):
+async def create_league(league: LeagueCreate, db: Session = Depends(get_db)):
     return crud_league.create_league(db=db, league=league)
 
 
 @router.get('/',response_model=List[League])
-def get_leagues(db:Session=Depends(get_db)):
-    return crud_league.get_leagues(db=db)
+async def get_leagues(db:Session=Depends(get_db)):
+    return await crud_league.get_leagues(db=db)
