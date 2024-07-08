@@ -36,14 +36,13 @@ class Prediction(Base):
     
   
     def to_dict(self):
-        fixture_dict = self.fixture.to_dict() if self.fixture else None
         return {
 
             "id": self.id,
             "home_prediction_score": self.home_prediction_score,
             "away_prediction_score": self.away_prediction_score,
             "user": self.user.to_dict() if self.user else None,
-            "fixture": fixture_dict,
+            "fixture": self.fixture.to_dict() if self.fixture else None,
             "result":self.result(),
             "correct_score":self.correct_score(),
 

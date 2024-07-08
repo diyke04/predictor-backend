@@ -28,8 +28,7 @@ async def create_prediction(db: AsyncSession, prediction: PredictionCreate, user
             .where(Prediction.id == db_prediction.id)
         )
         db_prediction = result.scalars().first()
-
-        return db_prediction
+        return db_prediction.to_dict()
     except Exception as e:
         logging.error(f"Error creating prediction: {e}")
         await db.rollback()
